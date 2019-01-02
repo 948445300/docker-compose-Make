@@ -1,0 +1,125 @@
+version: '2'
+
+services:
+   boyue-redis:
+    container_name: ${REDIS_CONTAINER_NAME}
+    image: ${REDIS_IMAGE}
+    restart: always
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - 6379:6379
+    networks:
+        boyue:
+          ipv4_address: ${REDIS_IPV4}
+
+   boyue-common-srv:
+    container_name: ${COMMON_CONTAINER_NAME}
+    image: ${COMMON_IMAGE}
+    restart: always
+    networks:
+        boyue:
+          ipv4_address: ${COMMON_IPV4}
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - 4200:4200
+    depends_on:
+      - boyue-redis
+    extra_hosts:
+      - ${REDIS_HOST_MAP}
+      - ${COMMON_HOST_MAP}
+      
+   boyue-student-srv:
+    container_name: ${STUDENT_CONTAINER_NAME}
+    image: ${STUDENT_IMAGE}
+    restart: always
+    networks:
+        boyue:
+          ipv4_address: ${STUDENT_IPV4}
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - 3100:3100
+      - 5100:5100
+    depends_on:
+      - boyue-redis
+    extra_hosts:
+      - ${REDIS_HOST_MAP}
+      - ${STUDENT_HOST_MAP}
+      
+   boyue-parent-srv:
+    container_name: ${PARENT_CONTAINER_NAME}
+    image: ${PARENT_IMAGE}
+    restart: always
+    networks:
+        boyue:
+          ipv4_address: ${PARENT_IPV4}
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - 4000:4000
+    depends_on:
+      - boyue-redis
+    extra_hosts:
+      - ${REDIS_HOST_MAP}
+      - ${PARENT_HOST_MAP}
+      
+   boyue-manager-srv:
+    container_name: ${MANAGER_CONTAINER_NAME}
+    image: ${MANAGER_IMAGE}
+    restart: always
+    networks:
+        boyue:
+          ipv4_address: ${MANAGER_IPV4}
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - 3300:3300
+    depends_on:
+      - boyue-redis
+    extra_hosts:
+      - ${REDIS_HOST_MAP}
+      - ${MANAGER_HOST_MAP}
+
+   boyue-manager-srvi1:
+    container_name: ${MANAGER1_CONTAINER_NAME}
+    image: ${MANAGER_IMAGE}
+    restart: always
+    networks:
+        boyue:
+          ipv4_address: ${MANAGER1_IPV4}
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - 3400:3300
+    depends_on:
+      - boyue-redis
+    extra_hosts:
+      - ${REDIS_HOST_MAP}
+      - ${MANAGER1_HOST_MAP}
+
+      
+   boyue-teacher-srv:
+    container_name: ${TEACHER_CONTAINER_NAME}
+    image: ${TEACHER_IMAGE}
+    restart: always
+    networks:
+        boyue:
+          ipv4_address: ${TEACHER_IPV4}
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - 3200:3200
+    depends_on:
+      - boyue-redis
+    extra_hosts:
+      - ${REDIS_HOST_MAP}
+      - ${TEACHER_HOST_MAP}
+      
+networks:
+  boyue:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: ${BOYUE_SUBNET}
